@@ -11,4 +11,5 @@ dependencies:
 
 test:
   override:
+    - pwd
     - make test
