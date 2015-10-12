@@ -30,7 +30,7 @@ func TestEvaluateInvalidOutputError(t *testing.T) {
 		Tests: TestCases{
 			TestCase{
 				Command: "echo foo",
-				Expected: []Assertion{
+				Expected: Assertions{
 					Assertion{DefaultMethod, "bar"},
 				},
 			},
@@ -47,7 +47,7 @@ func TestEvaluateTooFewOutputError(t *testing.T) {
 		Tests: TestCases{
 			TestCase{
 				Command: "echo foo",
-				Expected: []Assertion{
+				Expected: Assertions{
 					Assertion{DefaultMethod, "foo"},
 					Assertion{DefaultMethod, "bar"},
 				},
