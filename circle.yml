@@ -7,7 +7,7 @@ machine:
 dependencies:
   pre:
     - wget -O $HOME/go.tar.gz https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz
-    - (cd $HOME; tar xvf go1.5.1.linux-amd64.tar.gz)
+    - (cd $HOME; tar xvf go.tar.gz)
 
 test:
   override:
