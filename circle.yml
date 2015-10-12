@@ -11,5 +11,4 @@ dependencies:
 
 test:
   override:
-    - pwd
-    - make test
+    - env PATH=$(pwd):$PATH make test
