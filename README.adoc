@@ -1,0 +1,23 @@
+= shelltest
+
+Shell test tool inspired by doctool in link:https://pymotw.com/2/doctest/[Python] and link:http://elixir-lang.org/docs/v1.0/ex_unit/ExUnit.DocTest.html[Elixir].
+
+NOTE: shelltest is ALPHA version
+
+== Example
+
+.example/hello.txt
+----
+include::example/hello.txt[]
+----
+.run shelltest
+[source,bash]
+----
+include::example/shelltest.txt[]
+----
+
+== License
+
+Copyright (C) link:https://github.com/liquidz[uochan]
+
+Distributed under the MIT License.

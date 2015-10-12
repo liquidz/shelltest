@@ -1,0 +1,4 @@
+$ shelltest example/hello.txt
+..
+
+2 tests, 0 failures
