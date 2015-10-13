@@ -1,4 +1,4 @@
-= shelltest
+= shelltest image:https://circleci.com/gh/liquidz/shelltest.svg?style=svg["Circle CI", link="https://circleci.com/gh/liquidz/shelltest"]
 
 Shell test tool inspired by doctool in link:https://pymotw.com/2/doctest/[Python] and link:http://elixir-lang.org/docs/v1.0/ex_unit/ExUnit.DocTest.html[Elixir].
 
