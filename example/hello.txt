@@ -1,9 +1,4 @@
-Script started on Mon Oct 12 22:49:04 2015
 bash$ echo hello shelltest
 hello shelltest
 bash$ echo $?
 0
-bash$ exit
-exit
-
-Script done on Mon Oct 12 22:49:24 2015

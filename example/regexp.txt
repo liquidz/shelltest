@@ -1,0 +1,6 @@
+bash$ echo foobar
+=~ foo
+bash$ echo foobar
+=~ bar
+bash$ echo foobar
+=~ foobar

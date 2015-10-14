@@ -1,5 +1,6 @@
 .PHONEY: clean test install dockertest
 
+export PATH := .:$(PATH)
 TARGET = shelltest
 
 $(TARGET): *.go
@@ -9,7 +10,9 @@ clean:
 	\rm -f $(TARGET)
 
 test: $(TARGET)
-	go test && env PATH=`pwd`:$(PATH) ./$(TARGET) example/shelltest.txt
+	go test && \
+		./$(TARGET) example/hello_expected.txt && \
+		./$(TARGET) example/regexp_expected.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin

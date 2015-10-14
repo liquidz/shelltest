@@ -8,12 +8,35 @@ NOTE: shelltest is ALPHA version
 
 .example/hello.txt
 ----
-include::example/hello.txt[]
+bash$ echo hello shelltest
+hello shelltest
+bash$ echo $?
+0
 ----
 .run shelltest
 [source,bash]
 ----
-include::example/shelltest.txt[]
+$ shelltest example/hello.txt
+..
+
+2 tests, 0 failures
+----
+
+.example/regexp.txt
+----
+bash$ echo foobar
+=~ foo
+bash$ echo foobar
+=~ bar
+bash$ echo foobar
+=~ foobar
+----
+.run shelltest
+----
+$ shelltest example/regexp.txt
+...
+
+3 tests, 0 failures
 ----
 
 == License

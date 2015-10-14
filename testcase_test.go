@@ -5,13 +5,30 @@ import (
 	"testing"
 )
 
-func TestAssertionAssert(t *testing.T) {
+func TestAssertionAssertWithEqualMethod(t *testing.T) {
 	var a Assertion
 
 	a = Assertion{Method: EqualMethod, Text: "foo"}
 	tests := map[string]bool{
 		"foo": true,
 		"bar": false,
+	}
+	for s, expected := range tests {
+		if a.Assert(s) != expected {
+			t.Errorf("assert %s should be %v", s, expected)
+		}
+	}
+}
+
+func TestAssertionAssertWithRegexpMethod(t *testing.T) {
+	var a Assertion
+
+	a = Assertion{Method: RegexpMethod, Text: "foo"}
+	tests := map[string]bool{
+		"":       false,
+		"foo":    true,
+		"bar":    false,
+		"foobar": true,
 	}
 	for s, expected := range tests {
 		if a.Assert(s) != expected {
@@ -213,6 +230,38 @@ bb
 		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
 	}
 
+}
+
+func TestParseWithRegexpMethod(t *testing.T) {
+	sample := `
+core@foo ~ $ aa
+=~ foo
+`
+	ts, err := Parse(sample)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{
+			Command:  "aa",
+			Expected: Assertion{RegexpMethod, "foo"}.ToArray(),
+		},
+	}
+
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
+
+func TestParseErrorWithRegexpMethod(t *testing.T) {
+	_, err := Parse(`
+core@foo ~ $ aa
+=~ foo(
+`)
+	if err == nil {
+		t.Errorf("parsing regexp error should be occured")
+	}
 }
 
 func TestParseWithSpecifiedSection(t *testing.T) {

@@ -8,18 +8,21 @@ import (
 )
 
 const (
-	EqualMethod = "equals"
+	EqualMethod  = "equals"
+	RegexpMethod = "matches"
 )
 
 const (
-	DefaultSection  = "test"
-	DefaultMethod   = EqualMethod
-	CommandRegexp   = `^[^$]*\$\s*(.+)\s*$`
-	SectionRegexp   = `^\[\s*(.+)\s*\]$`
-	NewLineRegexp   = `[\r\n]+`
-	MultiLineRegexp = `\s+\\\s*[\r\n]+`
-	CommentRegexp   = `^\s*#`
+	DefaultSection = "test"
+	DefaultMethod  = EqualMethod
 )
+
+var commandRegexp = regexp.MustCompile(`^[^$]*\$\s*(.+)\s*$`)
+var sectionRegexp = regexp.MustCompile(`^\[\s*(.+)\s*\]$`)
+var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
+var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)
+var commentRegexp = regexp.MustCompile(`^\s*#`)
+var regexpRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
 
 type TestSuite struct {
 	Before TestCases
@@ -46,12 +49,13 @@ func (a Assertion) ToArray() Assertions {
 }
 
 func (a *Assertion) Assert(s string) bool {
-	result := false
 	switch a.Method {
-	case "equals":
-		result = (a.Text == s)
+	case EqualMethod:
+		return (a.Text == s)
+	case RegexpMethod:
+		return regexp.MustCompile(a.Text).MatchString(s)
 	}
-	return result
+	return false
 }
 
 func (as Assertions) IsExpected(s string) bool {
@@ -130,24 +134,18 @@ func Parse(s string) (TestSuite, error) {
 	)
 
 	section := DefaultSection
-	mr := regexp.MustCompile(MultiLineRegexp)
-	sr := regexp.MustCompile(SectionRegexp)
-	cr := regexp.MustCompile(CommandRegexp)
-	nr := regexp.MustCompile(NewLineRegexp)
-	comment := regexp.MustCompile(CommentRegexp)
+	s = multiLineRegexp.ReplaceAllString(s, " ")
 
-	s = mr.ReplaceAllString(s, " ")
-
-	for _, l := range nr.Split(strings.TrimSpace(s), -1) {
+	for _, l := range newLineRegexp.Split(strings.TrimSpace(s), -1) {
 		if strings.TrimSpace(l) == "" {
 			continue
 		}
 
-		if comment.MatchString(l) {
+		if commentRegexp.MatchString(l) {
 			continue
 		}
 
-		match = sr.FindStringSubmatch(l)
+		match = sectionRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
 			ts.Append(section, tc)
 			tc = TestCase{}
@@ -155,7 +153,7 @@ func Parse(s string) (TestSuite, error) {
 			continue
 		}
 
-		match = cr.FindStringSubmatch(l)
+		match = commandRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
 			ts.Append(section, tc)
 			if match[1] == "exit" {
@@ -164,7 +162,15 @@ func Parse(s string) (TestSuite, error) {
 				tc = TestCase{Command: match[1]}
 			}
 		} else {
-			tc.AppendAssertion(DefaultMethod, l)
+			match = regexpRegexp.FindStringSubmatch(l)
+			if len(match) == 2 {
+				if _, err := regexp.Compile(match[1]); err != nil {
+					return ts, err
+				}
+				tc.AppendAssertion(RegexpMethod, match[1])
+			} else {
+				tc.AppendAssertion(DefaultMethod, l)
+			}
 		}
 	}
 
