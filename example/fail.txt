@@ -1,0 +1,4 @@
+bash$ (exit 1); echo $?
+0
+bash$ echo foo
+foo

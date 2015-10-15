@@ -1,32 +1,33 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 )
 
 func TestStartShell(t *testing.T) {
-	in, out, term, err := startShell("bash")
+	inch, outch, termch, err := startShell("bash")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	in <- "echo foo"
-	in <- "echo bar && echo baz"
-	in <- "exit"
+	inch <- "echo foo"
+	inch <- "echo bar && echo baz"
+	inch <- "exit"
 
-	expected := []string{
-		"foo",
-		"bar\nbaz",
-	}
+	var outActual []string
 loop:
-	for i := 0; ; i++ {
+	for {
 		select {
-		case s := <-out:
-			if s != expected[i] {
-				t.Errorf("expected: foo, actual: [%v]", expected[i])
-			}
-		case <-term:
+		case s := <-outch:
+			outActual = append(outActual, s)
+		case <-termch:
 			break loop
 		}
+	}
+
+	outExpected := []string{"foo", "bar\nbaz"}
+	if !reflect.DeepEqual(outExpected, outActual) {
+		t.Errorf("out expected: %v, actual: %v", outExpected, outActual)
 	}
 }

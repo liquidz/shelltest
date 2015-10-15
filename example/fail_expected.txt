@@ -1,0 +1,10 @@
+$ shelltest example/fail.txt
+
+0) (exit 1); echo $?
+   expected: [{equals 0}]
+   actual  : 1
+
+
+x.
+
+2 tests, 1 failures

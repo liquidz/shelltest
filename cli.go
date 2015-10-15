@@ -10,19 +10,33 @@ const (
 	DefaultShell      = "bash"
 	ExitCodeOK    int = 0
 	ExitCodeError int = 1 + iota
+	ColorBlack        = 30
+	ColorRed          = 31
+	ColorGreen        = 32
 )
 
 type CLI struct {
 	outStream, errStream io.Writer
 	suite                TestSuite
+	nocolor              bool
 }
 
-func (cli *CLI) out(format string, a ...interface{}) {
-	fmt.Fprintf(cli.outStream, format+"\n", a...)
+func (cli *CLI) colorize(color int, s string) string {
+	if cli.nocolor {
+		return s
+	} else {
+		return fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, s)
+	}
+}
+
+func (cli *CLI) out(color int, format string, a ...interface{}) {
+	format = cli.colorize(color, format+"\n")
+	fmt.Fprintf(cli.outStream, format, a...)
 }
 
 func (cli *CLI) err(format string, a ...interface{}) {
-	fmt.Fprintf(cli.errStream, format+"\n", a...)
+	format = cli.colorize(ColorRed, format+"\n")
+	fmt.Fprintf(cli.errStream, format, a...)
 }
 
 func (cli *CLI) Run(args []string) int {
@@ -39,6 +53,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.StringVar(&shell, "s", DefaultShell, "shell")
 	flags.BoolVar(&flagLint, "l", false, "lint")
 	flags.BoolVar(&ShellTestDebugMode, "d", false, "Debug mode")
+	flags.BoolVar(&cli.nocolor, "nocolor", false, "no color")
 	flags.BoolVar(&flagVersion, "v", false, "Print version information and quit.")
 
 	// Parse commandline flag
@@ -47,7 +62,7 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if flagVersion {
-		cli.err("%s version %s", Name, Version)
+		fmt.Fprintf(cli.errStream, "%s version %s\n", Name, Version)
 		return ExitCodeOK
 	}
 
@@ -69,7 +84,7 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if flagLint {
-		cli.out("success to parse\n%v", cli.suite.String())
+		cli.out(ColorGreen, "success to parse\n%v", cli.suite.String())
 		return ExitCodeOK
 	}
 
@@ -77,12 +92,17 @@ func (cli *CLI) Run(args []string) int {
 		if err == nil {
 			fmt.Fprint(cli.outStream, ".")
 		} else {
-			cli.err("\n%v\n", err)
-			fmt.Fprint(cli.errStream, "x")
+			cli.out(ColorRed, "\n%v\n", err)
+			fmt.Fprint(cli.outStream, "x")
 		}
 	})
 
-	cli.out("\n\n%v tests, %v failures", len(cli.suite.Tests), len(errs))
+	color := ColorGreen
+	if len(errs) > 0 {
+		color = ColorRed
+	}
+
+	cli.out(color, "\n\n%v tests, %v failures", len(cli.suite.Tests), len(errs))
 
 	if len(errs) > 0 {
 		return ExitCodeError

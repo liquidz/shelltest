@@ -17,7 +17,7 @@ const (
 	DefaultMethod  = EqualMethod
 )
 
-var commandRegexp = regexp.MustCompile(`^[^$]*\$\s*(.+)\s*$`)
+var commandRegexp = regexp.MustCompile(`^[^$]*\$\s+(.+)\s*$`)
 var sectionRegexp = regexp.MustCompile(`^\[\s*(.+)\s*\]$`)
 var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
 var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)

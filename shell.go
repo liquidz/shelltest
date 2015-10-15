@@ -39,7 +39,9 @@ func scanLoop(scanner *bufio.Scanner, outCh chan string, outTermCh chan bool) {
 			} else {
 				text := strings.TrimSpace(buf.String())
 				DebugPrint("out: [%v]", text)
-				outCh <- text
+				if text != "" {
+					outCh <- text
+				}
 				buf = new(bytes.Buffer)
 			}
 		} else {
@@ -49,7 +51,9 @@ func scanLoop(scanner *bufio.Scanner, outCh chan string, outTermCh chan bool) {
 	}
 	text := strings.TrimSpace(buf.String())
 	DebugPrint("out: [%v]", text)
-	outCh <- text
+	if text != "" {
+		outCh <- text
+	}
 	outTermCh <- true
 }
 
@@ -73,10 +77,10 @@ func startShell(shell string) (chan string, chan string, chan bool, error) {
 	}
 
 	io.WriteString(stdin, "\n")
-	scanner := bufio.NewScanner(stdout)
+	outScanner := bufio.NewScanner(stdout)
 
 	go inputLoop(stdin, inCh)
-	go scanLoop(scanner, outCh, outTermCh)
+	go scanLoop(outScanner, outCh, outTermCh)
 	go func() {
 		cmd.Wait()
 		<-outTermCh

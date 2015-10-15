@@ -12,7 +12,8 @@ clean:
 test: $(TARGET)
 	go test && \
 		./$(TARGET) example/hello_expected.txt && \
-		./$(TARGET) example/regexp_expected.txt
+		./$(TARGET) example/regexp_expected.txt && \
+		./$(TARGET) example/fail_expected.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin
