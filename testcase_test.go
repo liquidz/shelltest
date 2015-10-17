@@ -223,6 +223,7 @@ bb
 		TestCase{
 			Command:  "aa",
 			Expected: Assertion{DefaultMethod, "bb"}.ToArray(),
+			Comment:  "foo",
 		},
 	}
 

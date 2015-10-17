@@ -82,8 +82,8 @@ func TestEvaluateWithReturnCode(t *testing.T) {
 func TestEvaluateContainingEmptyOutput(t *testing.T) {
 	ts := TestSuite{
 		Tests: TestCases{
-			TestCase{"FOO=bar", Assertions{}},
-			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foo"}}},
+			TestCase{"FOO=bar", Assertions{}, ""},
+			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foo"}}, ""},
 		},
 	}
 	errs := Evaluate(DefaultShell, ts, nocallback)

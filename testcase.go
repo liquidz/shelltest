@@ -21,7 +21,7 @@ var commandRegexp = regexp.MustCompile(`^[^$]*\$\s+(.+)\s*$`)
 var sectionRegexp = regexp.MustCompile(`^\[\s*(.+)\s*\]$`)
 var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
 var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)
-var commentRegexp = regexp.MustCompile(`^\s*#`)
+var commentRegexp = regexp.MustCompile(`^\s*#\s*`)
 var regexpRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
 
 type TestSuite struct {
@@ -35,6 +35,7 @@ type TestCases []TestCase
 type TestCase struct {
 	Command  string
 	Expected Assertions
+	Comment  string
 }
 
 type Assertions []Assertion
@@ -133,6 +134,8 @@ func Parse(s string) (TestSuite, error) {
 		match []string
 	)
 
+	lastComment := ""
+
 	section := DefaultSection
 	s = multiLineRegexp.ReplaceAllString(s, " ")
 
@@ -142,6 +145,7 @@ func Parse(s string) (TestSuite, error) {
 		}
 
 		if commentRegexp.MatchString(l) {
+			lastComment = commentRegexp.ReplaceAllString(l, "")
 			continue
 		}
 
@@ -155,13 +159,15 @@ func Parse(s string) (TestSuite, error) {
 
 		match = commandRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
+			// Command Line
 			ts.Append(section, tc)
 			if match[1] == "exit" {
 				tc = TestCase{}
 			} else {
-				tc = TestCase{Command: match[1]}
+				tc = TestCase{Command: match[1], Comment: lastComment}
 			}
 		} else {
+			// Result Line
 			match = regexpRegexp.FindStringSubmatch(l)
 			if len(match) == 2 {
 				if _, err := regexp.Compile(match[1]); err != nil {
