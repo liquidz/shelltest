@@ -58,11 +58,12 @@ loop:
 			testcase := suite.Tests[i]
 			expected := testcase.Expected
 			if len(expected) == 0 {
+				DebugPrint("eval", "skip tests[%d]: %v", i, result)
 				callback(testcase, nil)
 				continue
 			}
 
-			DebugPrint("expected: %v, actual: %v", expected, result)
+			DebugPrint("eval", "expected[%d]: %v, actual: [%v]", i, expected, result)
 			if !expected.IsExpected(result) {
 				err := EvaludateError{n: i, test: testcase, result: result}
 				callback(testcase, err)

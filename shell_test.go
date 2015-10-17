@@ -13,6 +13,8 @@ func TestStartShell(t *testing.T) {
 
 	inch <- "echo foo"
 	inch <- "echo bar && echo baz"
+	inch <- "FOO=bar"
+	inch <- "echo $FOO"
 	inch <- "exit"
 
 	var outActual []string
@@ -26,7 +28,7 @@ loop:
 		}
 	}
 
-	outExpected := []string{"foo", "bar\nbaz"}
+	outExpected := []string{"foo", "bar\nbaz", "", "bar"}
 	if !reflect.DeepEqual(outExpected, outActual) {
 		t.Errorf("out expected: %v, actual: %v", outExpected, outActual)
 	}

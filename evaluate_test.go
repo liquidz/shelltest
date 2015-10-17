@@ -78,3 +78,16 @@ func TestEvaluateWithReturnCode(t *testing.T) {
 		t.Errorf("unexpected errors: %v", errs)
 	}
 }
+
+func TestEvaluateContainingEmptyOutput(t *testing.T) {
+	ts := TestSuite{
+		Tests: TestCases{
+			TestCase{"FOO=bar", Assertions{}},
+			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foo"}}},
+		},
+	}
+	errs := Evaluate(DefaultShell, ts, nocallback)
+	if len(errs) != 1 {
+		t.Errorf("one error should be occured: %v", errs)
+	}
+}

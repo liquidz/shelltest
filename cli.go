@@ -10,9 +10,9 @@ const (
 	DefaultShell      = "bash"
 	ExitCodeOK    int = 0
 	ExitCodeError int = 1 + iota
-	ColorBlack        = 30
 	ColorRed          = 31
 	ColorGreen        = 32
+	ColorYellow       = 33
 )
 
 type CLI struct {
@@ -84,16 +84,21 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if flagLint {
-		cli.out(ColorGreen, "success to parse\n%v", cli.suite.String())
+		cli.out(ColorGreen, "success to parse")
+		fmt.Fprintf(cli.outStream, "%v\n", cli.suite.String())
 		return ExitCodeOK
 	}
 
 	errs := Evaluate(shell, cli.suite, func(_ TestCase, err error) {
 		if err == nil {
-			fmt.Fprint(cli.outStream, ".")
+			if !ShellTestDebugMode {
+				fmt.Fprint(cli.outStream, ".")
+			}
 		} else {
 			cli.out(ColorRed, "\n%v\n", err)
-			fmt.Fprint(cli.outStream, "x")
+			if !ShellTestDebugMode {
+				fmt.Fprint(cli.outStream, "x")
+			}
 		}
 	})
 

@@ -20,7 +20,7 @@ func inputLoop(stdin io.WriteCloser, inCh chan string) {
 			io.WriteString(stdin, "exit\n")
 			break
 		} else {
-			DebugPrint("run: [%v]", s)
+			DebugPrint("shell", "run [%v]", s)
 			io.WriteString(stdin, fmt.Sprintf("echo %v\n", Delimiter))
 			io.WriteString(stdin, fmt.Sprintf("(exit $RT); %v; RT=$?\n", s))
 		}
@@ -38,19 +38,17 @@ func scanLoop(scanner *bufio.Scanner, outCh chan string, outTermCh chan bool) {
 				first = false
 			} else {
 				text := strings.TrimSpace(buf.String())
-				DebugPrint("out: [%v]", text)
-				if text != "" {
-					outCh <- text
-				}
+				DebugPrint("shell", "out <- [%v]", text)
+				outCh <- text
 				buf = new(bytes.Buffer)
 			}
 		} else {
-			DebugPrint("read: [%s]", text)
+			DebugPrint("shell", "read [%v]", text)
 			buf.WriteString(text + "\n")
 		}
 	}
 	text := strings.TrimSpace(buf.String())
-	DebugPrint("out: [%v]", text)
+	DebugPrint("shell", "out <- [%v]", text)
 	if text != "" {
 		outCh <- text
 	}
