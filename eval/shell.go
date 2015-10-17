@@ -1,9 +1,10 @@
-package main
+package eval
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
+	. "github.com/liquidz/shelltest/debug"
 	"io"
 	"os/exec"
 	"strings"

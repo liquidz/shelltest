@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	. "github.com/liquidz/shelltest/testcase"
 	"reflect"
 	"strings"
 	"testing"

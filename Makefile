@@ -20,4 +20,4 @@ install: $(TARGET)
 
 dockertest:
 	\rm -f $(TARGET)
-	docker run --rm -v `pwd`:/usr/src/myapp -w /usr/src/myapp golang make test
+	docker run --rm -v `pwd`:/usr/src/myapp -v ${GOPATH}:/go -w /usr/src/myapp golang make test

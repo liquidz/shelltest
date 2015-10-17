@@ -1,8 +1,10 @@
-package main
+package eval
 
 import (
 	"errors"
 	"fmt"
+	. "github.com/liquidz/shelltest/debug"
+	. "github.com/liquidz/shelltest/testcase"
 	"regexp"
 	"strings"
 )

@@ -1,6 +1,7 @@
-package main
+package eval
 
 import (
+	. "github.com/liquidz/shelltest/testcase"
 	"testing"
 )
 

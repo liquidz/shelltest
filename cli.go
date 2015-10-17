@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	. "github.com/liquidz/shelltest/debug"
+	. "github.com/liquidz/shelltest/eval"
+	. "github.com/liquidz/shelltest/testcase"
 	"io"
 )
 
