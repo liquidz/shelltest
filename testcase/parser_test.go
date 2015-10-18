@@ -122,12 +122,10 @@ core@foo ~ $ bb
 	}
 
 	expected := TestCases{
-		TestCase{
-			Command:  "aa > /dev/null 2>&1; echo $?",
-			Expected: Assertion{DefaultMethod, "0"}.ToArray()},
-		TestCase{
-			Command:  "bb > /dev/null 2>&1; echo $?",
-			Expected: Assertion{DefaultMethod, "0"}.ToArray()},
+		TestCase{Command: "aa"},
+		TestCase{Command: "echo $?", Expected: Assertion{DefaultMethod, "0"}.ToArray(), Comment: "aa"},
+		TestCase{Command: "bb"},
+		TestCase{Command: "echo $?", Expected: Assertion{DefaultMethod, "0"}.ToArray(), Comment: "bb"},
 	}
 	if !reflect.DeepEqual(expected, ts.Tests) {
 		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
@@ -159,10 +157,13 @@ func TestParseWithSpecifiedSection(t *testing.T) {
 	sample := `
 [before]
 core@foo ~ $ command
+xx
 
 [after]
 core@foo ~ $ after1
+xx
 core@foo ~ $ after2
+xx
 
 [test]
 core@foo ~ $ echo foo

@@ -1,6 +1,6 @@
 $ shelltest example/auto_assert.txt
-0) grep UNKNOWN hello.txt > /dev/null 2>&1; echo $?
-   command : grep UNKNOWN hello.txt > /dev/null 2>&1; echo $?
+1) grep UNKNOWN hello.txt
+   command : echo $?
    expected: [{equals 0}]
    actual  : 2
 

@@ -12,7 +12,7 @@ type TapFormatter struct{}
 func (f TapFormatter) Setup(suite TestSuite) string {
 	l := len(suite.Tests)
 	if l > 0 {
-		return fmt.Sprintf("1..%d\n", len(suite.Tests))
+		return fmt.Sprintf("1..%d\n", suite.Tests.Length())
 	} else {
 		return "0..0\n"
 	}

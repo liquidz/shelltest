@@ -35,7 +35,7 @@ func (f DefaultFormatter) Result(_ int, _ TestCase, err error) string {
 }
 
 func (f DefaultFormatter) TearDown(suite TestSuite, errors []error) string {
-	s := fmt.Sprintf("\n\n%v tests, %v failures\n", len(suite.Tests), len(errors))
+	s := fmt.Sprintf("\n\n%v tests, %v failures\n", suite.Tests.Length(), len(errors))
 	if len(errors) > 0 {
 		return RedStr(s)
 	}

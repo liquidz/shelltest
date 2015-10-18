@@ -3,7 +3,7 @@
 export PATH := .:$(PATH)
 TARGET = shelltest
 
-$(TARGET): *.go
+$(TARGET): **/*.go
 	go build -o $(TARGET)
 
 rebuild: clean $(TARGET)

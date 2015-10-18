@@ -19,7 +19,8 @@ func TestTapSetup(t *testing.T) {
 		t.Errorf("response should contains %v but %v", expected, actual)
 	}
 
-	actual = f.Setup(TestSuite{Tests: TestCases{TestCase{}, TestCase{}}})
+	tc := TestCase{Expected: Assertion{"a", "b"}.ToArray()}
+	actual = f.Setup(TestSuite{Tests: TestCases{tc, tc}})
 	expected = "1..2"
 	if !strings.Contains(actual, expected) {
 		t.Errorf("response should contains %v but %v", expected, actual)

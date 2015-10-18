@@ -35,6 +35,23 @@ func addAutoAssertion(tc TestCase) TestCase {
 	}
 }
 
+func getAutoAssertion(tc TestCase) TestCase {
+	if tc.IsEmpty() || NoAutoAssertion || len(tc.Expected) > 0 {
+		return TestCase{}
+	}
+
+	comment := tc.Comment
+	if comment == "" {
+		comment = tc.Command
+	}
+
+	return TestCase{
+		Command:  "echo $?",
+		Expected: Assertion{Method: EqualMethod, Text: "0"}.ToArray(),
+		Comment:  comment,
+	}
+}
+
 func Parse(s string) (TestSuite, error) {
 	var (
 		tc    TestCase
@@ -59,7 +76,8 @@ func Parse(s string) (TestSuite, error) {
 
 		match = sectionRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
-			ts.Append(section, addAutoAssertion(tc))
+			ts.Append(section, tc)
+			ts.Append(section, getAutoAssertion(tc))
 			tc = TestCase{}
 			section = match[1]
 			continue
@@ -68,7 +86,8 @@ func Parse(s string) (TestSuite, error) {
 		match = commandRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
 			// Command Line
-			ts.Append(section, addAutoAssertion(tc))
+			ts.Append(section, tc)
+			ts.Append(section, getAutoAssertion(tc))
 			if match[1] == "exit" {
 				tc = TestCase{}
 			} else {
@@ -88,7 +107,8 @@ func Parse(s string) (TestSuite, error) {
 		}
 	}
 
-	ts.Append(section, addAutoAssertion(tc))
+	ts.Append(section, tc)
+	ts.Append(section, getAutoAssertion(tc))
 
 	return ts, nil
 }

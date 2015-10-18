@@ -58,7 +58,7 @@ func Evaluate(shell string, suite TestSuite, callback Callback) []error {
 	testLen := len(suite.Tests)
 	DebugPrint("eval", "testLen: %d", testLen)
 loop:
-	for i := 0; ; i++ {
+	for i, n := 0, 0; ; i++ {
 		select {
 		case result := <-outch:
 			if i >= testLen {
@@ -73,22 +73,22 @@ loop:
 			expected := testcase.Expected
 			if len(expected) == 0 {
 				DebugPrint("eval", "skip tests[%d]: %v", i, result)
-				callback(i, testcase, nil)
 				continue
 			}
 
 			DebugPrint("eval", "expected[%d]: %v, actual: [%v]", i, expected, result)
 			if !expected.IsExpected(result) {
 				err := EvaluateError{No: i, Test: testcase, Result: result}
-				callback(i, testcase, err)
+				callback(n, testcase, err)
 				errs = append(errs, err)
 			} else {
-				callback(i, testcase, nil)
+				callback(n, testcase, nil)
 			}
+			n++
 		case <-termch:
 			if i < testLen-1 {
 				err := errors.New(fmt.Sprintf("too few command result"))
-				callback(i, suite.Tests[testLen-1], err)
+				callback(n, suite.Tests[testLen-1], err)
 				errs = append(errs, err)
 			}
 			break loop

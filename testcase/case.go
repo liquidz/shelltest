@@ -70,3 +70,14 @@ func (tc *TestCase) AppendAssertion(method, text string) {
 func (tc *TestCase) String() string {
 	return fmt.Sprintf("Command: %v, Assertion: %v", tc.Command, tc.Expected)
 }
+
+func (tcs TestCases) Length() int {
+	n := 0
+	for _, tc := range tcs {
+		if len(tc.Expected) == 0 {
+			continue
+		}
+		n++
+	}
+	return n
+}

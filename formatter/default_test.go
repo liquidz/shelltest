@@ -47,7 +47,8 @@ func TestDefaultResultFail(t *testing.T) {
 
 func TestDefaultTearDown(t *testing.T) {
 	f := DefaultFormatter{}
-	ts := TestCases{TestCase{}, TestCase{}}
+	tc := TestCase{Expected: Assertion{"a", "b"}.ToArray()}
+	ts := TestCases{tc, tc}
 	var expected, actual string
 
 	actual = f.TearDown(TestSuite{Tests: ts}, []error{})
