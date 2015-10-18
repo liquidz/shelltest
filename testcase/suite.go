@@ -10,6 +10,7 @@ type TestSuite struct {
 	Before TestCases
 	After  TestCases
 	Tests  TestCases
+	EnvMap map[string]string
 }
 
 func (ts *TestSuite) Append(section string, test TestCase) error {

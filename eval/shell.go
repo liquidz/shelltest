@@ -56,7 +56,7 @@ func scanLoop(scanner *bufio.Scanner, outCh chan string, outTermCh chan bool) {
 	outTermCh <- true
 }
 
-func startShell(shell string) (chan string, chan string, chan bool, error) {
+func startShell(shell string, initCommands ...string) (chan string, chan string, chan bool, error) {
 	inCh := make(chan string)
 	outCh := make(chan string)
 	outTermCh := make(chan bool)
@@ -76,6 +76,9 @@ func startShell(shell string) (chan string, chan string, chan bool, error) {
 	}
 
 	io.WriteString(stdin, "\n")
+	for _, c := range initCommands {
+		io.WriteString(stdin, c+"\n")
+	}
 	outScanner := bufio.NewScanner(stdout)
 
 	go inputLoop(stdin, inCh)

@@ -12,7 +12,7 @@ clean:
 	\rm -f $(TARGET)
 
 test: $(TARGET)
-	go test && \
+	go test ./... && \
 		./$(TARGET) example/hello_expected.txt && \
 		./$(TARGET) example/regexp_expected.txt && \
 		./$(TARGET) example/fail_expected.txt && \

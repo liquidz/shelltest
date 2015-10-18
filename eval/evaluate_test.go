@@ -84,7 +84,7 @@ func TestEvaluateContainingEmptyOutput(t *testing.T) {
 	ts := TestSuite{
 		Tests: TestCases{
 			TestCase{"FOO=bar", Assertions{}, ""},
-			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foo"}}, ""},
+			TestCase{"echo foo$FOO", Assertions{Assertion{DefaultMethod, "baz"}}, ""},
 		},
 	}
 	errs := Evaluate("bash", ts, nocallback)
@@ -92,3 +92,33 @@ func TestEvaluateContainingEmptyOutput(t *testing.T) {
 		t.Errorf("one error should be occured: %v", errs)
 	}
 }
+
+func TestEvaluateWithEnvMap(t *testing.T) {
+	ts := TestSuite{
+		Tests: TestCases{
+			TestCase{"echo foo$FOO", Assertions{Assertion{DefaultMethod, "foobar"}}, ""},
+		},
+		EnvMap: map[string]string{
+			"FOO": "bar",
+		},
+	}
+
+	errs := Evaluate("bash", ts, nocallback)
+	if len(errs) != 0 {
+		t.Errorf("unexpected errors: %v", errs)
+	}
+}
+
+// TODO: Evaluate cannot receive empty string from outch
+//func TestEvaluateWithUndefinedVariable(t *testing.T) {
+//	ts := TestSuite{
+//		Tests: TestCases{
+//			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foobar"}}, ""},
+//		},
+//	}
+//
+//	errs := Evaluate("bash", ts, nocallback)
+//	if len(errs) != 0 {
+//		t.Errorf("unexpected errors: %v", errs)
+//	}
+//}

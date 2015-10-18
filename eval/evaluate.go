@@ -40,7 +40,12 @@ func Evaluate(shell string, suite TestSuite, callback Callback) []error {
 
 	ansiColorRegexp := regexp.MustCompile(AnsiColor)
 
-	inch, outch, termch, err := startShell(shell)
+	var exports []string
+	for k, v := range suite.EnvMap {
+		exports = append(exports, fmt.Sprintf("export %s=%s", k, v))
+	}
+
+	inch, outch, termch, err := startShell(shell, exports...)
 	if err != nil {
 		return []error{err}
 	}
@@ -51,11 +56,13 @@ func Evaluate(shell string, suite TestSuite, callback Callback) []error {
 	inch <- "exit"
 
 	testLen := len(suite.Tests)
+	DebugPrint("eval", "testLen: %d", testLen)
 loop:
 	for i := 0; ; i++ {
 		select {
 		case result := <-outch:
 			if i >= testLen {
+				DebugPrint("eval", "continue  %d", i)
 				continue
 			}
 

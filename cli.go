@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	. "github.com/liquidz/shelltest/color"
@@ -9,6 +10,8 @@ import (
 	. "github.com/liquidz/shelltest/formatter"
 	. "github.com/liquidz/shelltest/testcase"
 	"io"
+	"os"
+	"strings"
 )
 
 const (
@@ -16,6 +19,24 @@ const (
 	ExitCodeOK    int = 0
 	ExitCodeError int = 1 + iota
 )
+
+type Env struct {
+	Map map[string]string
+}
+
+func (e *Env) String() string {
+	return fmt.Sprintf("%v", e.Map)
+}
+
+func (e *Env) Set(value string) error {
+	kv := strings.SplitN(value, "=", 2)
+	if len(kv) != 2 {
+		return errors.New(fmt.Sprintf("fixme"))
+	}
+
+	e.Map[kv[0]] = kv[1]
+	return nil
+}
 
 type CLI struct {
 	outStream, errStream io.Writer
@@ -39,6 +60,9 @@ func (cli *CLI) Run(args []string) int {
 		fmtr        string
 	)
 
+	cwd, _ := os.Getwd()
+	env := Env{map[string]string{"CWD": cwd}}
+
 	// Define option flag parse
 	flags := flag.NewFlagSet(Name, flag.ContinueOnError)
 	flags.SetOutput(cli.errStream)
@@ -50,6 +74,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&NoColor, "nocolor", false, "no color")
 	flags.BoolVar(&NoAutoAssertion, "noautoassert", false, "no auto assert")
 	flags.BoolVar(&flagVersion, "v", false, "Print version information and quit.")
+	flags.Var(&env, "E", "environmental variable")
 
 	// Parse commandline flag
 	if err := flags.Parse(args[1:]); err != nil {
@@ -77,6 +102,7 @@ func (cli *CLI) Run(args []string) int {
 	if err != nil {
 		cli.err("failed to parse: %v", err)
 	}
+	cli.suite.EnvMap = env.Map
 
 	if flagLint {
 		cli.out(GreenStr("success to parse"))
