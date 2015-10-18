@@ -1,6 +1,7 @@
 $ shelltest example/fail.txt
 
 0) (exit 1); echo $?
+   command : (exit 1); echo $?
    expected: [{equals 0}]
    actual  : 1
 

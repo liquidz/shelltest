@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	. "github.com/liquidz/shelltest/color"
 	. "github.com/liquidz/shelltest/debug"
 	. "github.com/liquidz/shelltest/eval"
+	. "github.com/liquidz/shelltest/formatter"
 	. "github.com/liquidz/shelltest/testcase"
 	"io"
 )
@@ -13,32 +15,19 @@ const (
 	DefaultShell      = "bash"
 	ExitCodeOK    int = 0
 	ExitCodeError int = 1 + iota
-	ColorRed          = 31
-	ColorGreen        = 32
-	ColorYellow       = 33
 )
 
 type CLI struct {
 	outStream, errStream io.Writer
 	suite                TestSuite
-	nocolor              bool
 }
 
-func (cli *CLI) colorize(color int, s string) string {
-	if cli.nocolor {
-		return s
-	} else {
-		return fmt.Sprintf("\x1b[%dm%s\x1b[0m", color, s)
-	}
-}
-
-func (cli *CLI) out(color int, format string, a ...interface{}) {
-	format = cli.colorize(color, format+"\n")
-	fmt.Fprintf(cli.outStream, format, a...)
+func (cli *CLI) out(format string, a ...interface{}) {
+	fmt.Fprintf(cli.outStream, format+"\n", a...)
 }
 
 func (cli *CLI) err(format string, a ...interface{}) {
-	format = cli.colorize(ColorRed, format+"\n")
+	format = RedStr(format + "\n")
 	fmt.Fprintf(cli.errStream, format, a...)
 }
 
@@ -47,6 +36,7 @@ func (cli *CLI) Run(args []string) int {
 		flagLint    bool
 		flagVersion bool
 		shell       string
+		fmtr        string
 	)
 
 	// Define option flag parse
@@ -54,9 +44,10 @@ func (cli *CLI) Run(args []string) int {
 	flags.SetOutput(cli.errStream)
 
 	flags.StringVar(&shell, "s", DefaultShell, "shell")
+	flags.StringVar(&fmtr, "f", "default", "formatter")
 	flags.BoolVar(&flagLint, "l", false, "lint")
 	flags.BoolVar(&ShellTestDebugMode, "d", false, "Debug mode")
-	flags.BoolVar(&cli.nocolor, "nocolor", false, "no color")
+	flags.BoolVar(&NoColor, "nocolor", false, "no color")
 	flags.BoolVar(&flagVersion, "v", false, "Print version information and quit.")
 
 	// Parse commandline flag
@@ -87,34 +78,29 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	if flagLint {
-		cli.out(ColorGreen, "success to parse")
+		cli.out(GreenStr("success to parse"))
 		fmt.Fprintf(cli.outStream, "%v\n", cli.suite.String())
 		return ExitCodeOK
 	}
 
-	errs := Evaluate(shell, cli.suite, func(_ TestCase, err error) {
-		if err == nil {
-			if !ShellTestDebugMode {
-				fmt.Fprint(cli.outStream, ".")
-			}
-		} else {
-			cli.out(ColorRed, "\n%v\n", err)
-			if !ShellTestDebugMode {
-				fmt.Fprint(cli.outStream, "x")
-			}
+	formatter := SelectFormatter(fmtr)
+
+	if s := formatter.Setup(cli.suite); s != "" {
+		fmt.Fprintf(cli.outStream, s)
+	}
+
+	errs := Evaluate(shell, cli.suite, func(no int, tc TestCase, err error) {
+		if s := formatter.Result(no, tc, err); s != "" {
+			fmt.Fprintf(cli.outStream, s)
 		}
 	})
 
-	color := ColorGreen
-	if len(errs) > 0 {
-		color = ColorRed
+	if s := formatter.TearDown(cli.suite, errs); s != "" {
+		fmt.Fprintf(cli.outStream, s)
 	}
-
-	cli.out(color, "\n\n%v tests, %v failures", len(cli.suite.Tests), len(errs))
 
 	if len(errs) > 0 {
 		return ExitCodeError
 	}
-
 	return ExitCodeOK
 }

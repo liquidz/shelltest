@@ -1,0 +1,4 @@
+$ shelltest -f tap example/fail.txt
+1..2
+not ok 1 - (exit 1); echo $?
+ok 2 - echo foo

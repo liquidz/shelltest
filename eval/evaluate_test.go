@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func nocallback(_ TestCase, _ error) {}
+func nocallback(_ int, _ TestCase, _ error) {}
 
 func TestEvaluate(t *testing.T) {
 	ts := TestSuite{
@@ -20,7 +20,7 @@ func TestEvaluate(t *testing.T) {
 		},
 	}
 
-	errs := Evaluate(DefaultShell, ts, nocallback)
+	errs := Evaluate("bash", ts, nocallback)
 	if len(errs) != 0 {
 		t.Errorf("unexpected errors: %v", errs)
 	}
@@ -37,7 +37,7 @@ func TestEvaluateInvalidOutputError(t *testing.T) {
 			},
 		},
 	}
-	errs := Evaluate(DefaultShell, ts, nocallback)
+	errs := Evaluate("bash", ts, nocallback)
 	if len(errs) != 1 {
 		t.Errorf("unexpected errors: %v", errs)
 	}
@@ -55,7 +55,7 @@ func TestEvaluateTooFewOutputError(t *testing.T) {
 			},
 		},
 	}
-	errs := Evaluate(DefaultShell, ts, nocallback)
+	errs := Evaluate("bash", ts, nocallback)
 	if len(errs) != 1 {
 		t.Errorf("unexpected errors: %v", errs)
 	}
@@ -74,7 +74,7 @@ func TestEvaluateWithReturnCode(t *testing.T) {
 			},
 		},
 	}
-	errs := Evaluate(DefaultShell, ts, nocallback)
+	errs := Evaluate("bash", ts, nocallback)
 	if len(errs) != 0 {
 		t.Errorf("unexpected errors: %v", errs)
 	}
@@ -87,7 +87,7 @@ func TestEvaluateContainingEmptyOutput(t *testing.T) {
 			TestCase{"echo $FOO", Assertions{Assertion{DefaultMethod, "foo"}}, ""},
 		},
 	}
-	errs := Evaluate(DefaultShell, ts, nocallback)
+	errs := Evaluate("bash", ts, nocallback)
 	if len(errs) != 1 {
 		t.Errorf("one error should be occured: %v", errs)
 	}

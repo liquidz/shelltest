@@ -1,10 +1,12 @@
-.PHONEY: clean test install dockertest
+.PHONEY: rebuild clean test install dockertest
 
 export PATH := .:$(PATH)
 TARGET = shelltest
 
 $(TARGET): *.go
 	go build -o $(TARGET)
+
+rebuild: clean $(TARGET)
 
 clean:
 	\rm -f $(TARGET)
@@ -13,7 +15,8 @@ test: $(TARGET)
 	go test && \
 		./$(TARGET) example/hello_expected.txt && \
 		./$(TARGET) example/regexp_expected.txt && \
-		./$(TARGET) example/fail_expected.txt
+		./$(TARGET) example/fail_expected.txt && \
+		./$(TARGET) example/fail_expected_tap.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin

@@ -14,20 +14,25 @@ const (
 	AnsiColor = `\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`
 )
 
-type Callback func(TestCase, error)
+type Callback func(int, TestCase, error)
 
-type EvaludateError struct {
-	n      int
-	test   TestCase
-	result string
+type EvaluateError struct {
+	No     int
+	Test   TestCase
+	Result string
 }
 
-func (e EvaludateError) Error() string {
+func (e EvaluateError) Error() string {
+	comment := e.Test.Comment
+	if comment == "" {
+		comment = e.Test.Command
+	}
 	return strings.TrimSpace(fmt.Sprintf(`
 %d) %v
+   command : %v
    expected: %v
    actual  : %v
-  `, e.n, e.test.Command, e.test.Expected, e.result))
+  `, e.No, comment, e.Test.Command, e.Test.Expected, e.Result))
 }
 
 func Evaluate(shell string, suite TestSuite, callback Callback) []error {
@@ -61,22 +66,22 @@ loop:
 			expected := testcase.Expected
 			if len(expected) == 0 {
 				DebugPrint("eval", "skip tests[%d]: %v", i, result)
-				callback(testcase, nil)
+				callback(i, testcase, nil)
 				continue
 			}
 
 			DebugPrint("eval", "expected[%d]: %v, actual: [%v]", i, expected, result)
 			if !expected.IsExpected(result) {
-				err := EvaludateError{n: i, test: testcase, result: result}
-				callback(testcase, err)
+				err := EvaluateError{No: i, Test: testcase, Result: result}
+				callback(i, testcase, err)
 				errs = append(errs, err)
 			} else {
-				callback(testcase, nil)
+				callback(i, testcase, nil)
 			}
 		case <-termch:
 			if i < testLen-1 {
 				err := errors.New(fmt.Sprintf("too few command result"))
-				callback(suite.Tests[testLen-1], err)
+				callback(i, suite.Tests[testLen-1], err)
 				errs = append(errs, err)
 			}
 			break loop
