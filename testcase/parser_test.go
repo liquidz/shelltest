@@ -112,6 +112,49 @@ core@foo ~ $ aa
 	}
 }
 
+func TestParseWithAutoAssertion(t *testing.T) {
+	ts, err := Parse(`
+core@foo ~ $ aa
+core@foo ~ $ bb
+`)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{
+			Command:  "aa > /dev/null 2>&1; echo $?",
+			Expected: Assertion{DefaultMethod, "0"}.ToArray()},
+		TestCase{
+			Command:  "bb > /dev/null 2>&1; echo $?",
+			Expected: Assertion{DefaultMethod, "0"}.ToArray()},
+	}
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
+
+func TestParseWithoutAutoAssertion(t *testing.T) {
+	NoAutoAssertion = true
+	ts, err := Parse(`
+core@foo ~ $ aa
+core@foo ~ $ bb
+`)
+	NoAutoAssertion = false
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{Command: "aa"},
+		TestCase{Command: "bb"},
+	}
+
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
+
 func TestParseWithSpecifiedSection(t *testing.T) {
 	sample := `
 [before]

@@ -15,12 +15,25 @@ const (
 	DefaultMethod  = EqualMethod
 )
 
+var NoAutoAssertion = false
 var commandRegexp = regexp.MustCompile(`^[^$]*\$\s+(.+)\s*$`)
 var sectionRegexp = regexp.MustCompile(`^\[\s*(.+)\s*\]$`)
 var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
 var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)
 var commentRegexp = regexp.MustCompile(`^\s*#\s*`)
 var regexpRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
+
+func addAutoAssertion(tc TestCase) TestCase {
+	if tc.IsEmpty() || NoAutoAssertion || len(tc.Expected) > 0 {
+		return tc
+	}
+
+	return TestCase{
+		Command:  tc.Command + " > /dev/null 2>&1; echo $?",
+		Expected: Assertion{Method: EqualMethod, Text: "0"}.ToArray(),
+		Comment:  tc.Comment,
+	}
+}
 
 func Parse(s string) (TestSuite, error) {
 	var (
@@ -46,7 +59,7 @@ func Parse(s string) (TestSuite, error) {
 
 		match = sectionRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
-			ts.Append(section, tc)
+			ts.Append(section, addAutoAssertion(tc))
 			tc = TestCase{}
 			section = match[1]
 			continue
@@ -55,7 +68,7 @@ func Parse(s string) (TestSuite, error) {
 		match = commandRegexp.FindStringSubmatch(l)
 		if len(match) == 2 {
 			// Command Line
-			ts.Append(section, tc)
+			ts.Append(section, addAutoAssertion(tc))
 			if match[1] == "exit" {
 				tc = TestCase{}
 			} else {
@@ -75,7 +88,7 @@ func Parse(s string) (TestSuite, error) {
 		}
 	}
 
-	ts.Append(section, tc)
+	ts.Append(section, addAutoAssertion(tc))
 
 	return ts, nil
 }

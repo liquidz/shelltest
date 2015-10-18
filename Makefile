@@ -16,7 +16,9 @@ test: $(TARGET)
 		./$(TARGET) example/hello_expected.txt && \
 		./$(TARGET) example/regexp_expected.txt && \
 		./$(TARGET) example/fail_expected.txt && \
-		./$(TARGET) example/fail_expected_tap.txt
+		./$(TARGET) example/fail_expected_tap.txt && \
+		./$(TARGET) example/auto_assert_expected.txt && \
+		./$(TARGET) example/auto_assert_no_expected.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin

@@ -48,6 +48,7 @@ func (cli *CLI) Run(args []string) int {
 	flags.BoolVar(&flagLint, "l", false, "lint")
 	flags.BoolVar(&ShellTestDebugMode, "d", false, "Debug mode")
 	flags.BoolVar(&NoColor, "nocolor", false, "no color")
+	flags.BoolVar(&NoAutoAssertion, "noautoassert", false, "no auto assert")
 	flags.BoolVar(&flagVersion, "v", false, "Print version information and quit.")
 
 	// Parse commandline flag
