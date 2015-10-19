@@ -20,5 +20,4 @@ deployment:
       - go get github.com/mitchellh/gox
       - go get github.com/tcnksm/ghr
       - gox --osarch "darwin/amd64 linux/386 linux/amd64 linux/arm" --output "dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
-      - grep Version version.go | awk '{print $5}' | sed 's/"//g'
-      - ghr -t $GITHUB_TOKEN -u liquidz -r $CIRCLE_PROJECT_REPONAME --replace `grep Version version.go | awk '{print $5}' | sed 's/"//g'` dist/
+      - ghr -t $GITHUB_TOKEN -u liquidz -r $CIRCLE_PROJECT_REPONAME --replace v`grep Version version.go | awk '{print $5}' | sed 's/"//g'` dist/
