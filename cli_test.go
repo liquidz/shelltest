@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	. "github.com/liquidz/shelltest/mock"
 	. "github.com/liquidz/shelltest/testcase"
 	"reflect"
 	"strings"
@@ -61,10 +62,10 @@ func TestRunNotExistingFile(t *testing.T) {
 func TestRunLint(t *testing.T) {
 	cli, _, _ := setup()
 
-	MockReadFile(`
+	MockReadFile(ReadFileReturn{`
 	$ echo foo
 	foo
-	`, nil)
+	`, nil})
 	defer ResetMock()
 
 	status := cli.Run([]string{"./shelltest", "-l", "foo"})

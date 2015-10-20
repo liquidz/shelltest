@@ -8,6 +8,7 @@ import (
 	. "github.com/liquidz/shelltest/debug"
 	. "github.com/liquidz/shelltest/eval"
 	. "github.com/liquidz/shelltest/formatter"
+	. "github.com/liquidz/shelltest/mock"
 	. "github.com/liquidz/shelltest/testcase"
 	"io"
 	"os"
