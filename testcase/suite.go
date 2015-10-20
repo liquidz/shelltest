@@ -1,7 +1,6 @@
 package testcase
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -13,23 +12,13 @@ type TestSuite struct {
 	EnvMap map[string]string
 }
 
-func (ts *TestSuite) Append(section string, test TestCase) error {
+func (ts *TestSuite) Append(test TestCase) error {
 	if test.IsEmpty() {
 		return nil
 	}
 
-	switch section {
-	case "before":
-		ts.Before = append(ts.Before, test)
-		return nil
-	case "after":
-		ts.After = append(ts.After, test)
-		return nil
-	case "test":
-		ts.Tests = append(ts.Tests, test)
-		return nil
-	}
-	return errors.New(fmt.Sprintf("unknown section: %v", section))
+	ts.Tests = append(ts.Tests, test)
+	return nil
 }
 
 func (ts *TestSuite) String() string {
