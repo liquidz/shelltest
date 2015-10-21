@@ -18,7 +18,8 @@ test: $(TARGET)
 		./$(TARGET) example/fail_expected.txt && \
 		./$(TARGET) example/fail_expected_tap.txt && \
 		./$(TARGET) example/auto_assert_expected.txt && \
-		./$(TARGET) example/auto_assert_no_expected.txt
+		./$(TARGET) example/auto_assert_no_expected.txt && \
+		./$(TARGET) example/require_expected.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin
@@ -26,3 +27,4 @@ install: $(TARGET)
 dockertest:
 	\rm -f $(TARGET)
 	docker run --rm -v `pwd`:/usr/src/myapp -v ${GOPATH}:/go -w /usr/src/myapp golang make test
+	\rm -f $(TARGET)

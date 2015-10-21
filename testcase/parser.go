@@ -22,6 +22,7 @@ var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
 var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)
 var commentRegexp = regexp.MustCompile(`^\s*#\s*`)
 var regexpRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
+var requireRegexp = regexp.MustCompile(`^@require\s+(.+)\s*$`)
 
 func getAutoAssertion(tc TestCase) TestCase {
 	if tc.IsEmpty() || NoAutoAssertion || len(tc.Expected) > 0 {
@@ -62,6 +63,20 @@ func Parse(filepath string) (TestSuite, error) {
 		// comment
 		if commentRegexp.MatchString(l) {
 			lastComment = commentRegexp.ReplaceAllString(l, "")
+			continue
+		}
+
+		// require
+		if match = requireRegexp.FindStringSubmatch(l); len(match) == 2 {
+			ts.Append(tc)
+			ts.Append(getAutoAssertion(tc))
+			tc = TestCase{}
+
+			ts2, err := Parse(match[1])
+			if err != nil {
+				return ts, err
+			}
+			ts = ts.Merge(ts2)
 			continue
 		}
 

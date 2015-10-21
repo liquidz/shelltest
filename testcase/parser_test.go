@@ -169,3 +169,35 @@ core@foo ~ $ bb
 		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
 	}
 }
+
+func TestParseWithRequire(t *testing.T) {
+	MockReadFile(
+		ReadFileReturn{`
+$ foo
+bar
+@require outerfile.txt
+$ bar
+baz
+		`, nil},
+		ReadFileReturn{`
+$ hello
+world
+		`, nil},
+	)
+	defer ResetMock()
+
+	ts, err := Parse("foo")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{Command: "foo", Expected: Assertion{DefaultMethod, "bar"}.ToArray()},
+		TestCase{Command: "hello", Expected: Assertion{DefaultMethod, "world"}.ToArray()},
+		TestCase{Command: "bar", Expected: Assertion{DefaultMethod, "baz"}.ToArray()},
+	}
+
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
