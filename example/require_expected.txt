@@ -1,0 +1,4 @@
+$ shelltest example/require.txt
+..
+
+2 tests, 0 failures
