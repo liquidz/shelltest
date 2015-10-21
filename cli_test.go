@@ -74,24 +74,49 @@ func TestRunLint(t *testing.T) {
 	}
 
 	if len(cli.suite.Tests) != 1 {
-		t.Errorf("FIXME")
+		t.Errorf("expected length is 1, but %d", len(cli.suite.Tests))
 	}
 
 	expected := TestCase{
 		Command:  "echo foo",
-		Expected: []Assertion{Assertion{Method: DefaultMethod, Text: "foo"}},
+		Expected: Assertion{Method: DefaultMethod, Text: "foo"}.ToArray(),
 	}
 
 	if !reflect.DeepEqual(expected, cli.suite.Tests[0]) {
-		t.Errorf("FIXME")
+		t.Errorf("expected is %v, but %v", expected, cli.suite.Tests[0])
 	}
 }
 
-//func TestRun_fFlag(t *testing.T) {
-//	outStream, errStream := new(bytes.Buffer), new(bytes.Buffer)
-//	cli := &CLI{outStream: outStream, errStream: errStream}
-//	args := strings.Split("./shunig -f", " ")
-//
-//	status := cli.Run(args)
-//	_ = status
-//}
+func TestRunWithMultipleFiles(t *testing.T) {
+	cli, _, _ := setup()
+
+	MockReadFile(
+		ReadFileReturn{`
+$ echo foo
+foo
+		`, nil},
+		ReadFileReturn{`
+$ echo bar
+bar
+		`, nil},
+	)
+	defer ResetMock()
+
+	status := cli.Run([]string{"./shelltest", "-l", "foo", "bar"})
+	if status != ExitCodeOK {
+		t.Errorf("expected %v to eq %v", status, ExitCodeOK)
+	}
+
+	if len(cli.suite.Tests) != 2 {
+		t.Errorf("expected length is 2, but %d", len(cli.suite.Tests))
+	}
+
+	expected := TestCases{
+		TestCase{Command: "echo foo", Expected: Assertion{DefaultMethod, "foo"}.ToArray()},
+		TestCase{Command: "echo bar", Expected: Assertion{DefaultMethod, "bar"}.ToArray()},
+	}
+
+	if !reflect.DeepEqual(expected, cli.suite.Tests) {
+		t.Errorf("expected is %v, but %v", expected, cli.suite.Tests)
+	}
+}

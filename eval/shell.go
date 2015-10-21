@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	. "github.com/liquidz/shelltest/color"
 	. "github.com/liquidz/shelltest/debug"
 	"io"
 	"os/exec"
@@ -34,7 +35,7 @@ func scanLoop(scanner *bufio.Scanner, outCh chan string, outTermCh chan bool) {
 
 	for scanner.Scan() {
 		text := scanner.Text()
-		if text == Delimiter {
+		if DeleteColor(text) == Delimiter {
 			if first {
 				first = false
 			} else {

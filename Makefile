@@ -13,13 +13,13 @@ clean:
 
 test: $(TARGET)
 	go test ./... && \
-		./$(TARGET) example/hello_expected.txt && \
-		./$(TARGET) example/regexp_expected.txt && \
-		./$(TARGET) example/fail_expected.txt && \
-		./$(TARGET) example/fail_expected_tap.txt && \
-		./$(TARGET) example/auto_assert_expected.txt && \
-		./$(TARGET) example/auto_assert_no_expected.txt && \
-		./$(TARGET) example/require_expected.txt
+		./$(TARGET) example/hello_expected.txt  \
+					example/regexp_expected.txt  \
+					example/fail_expected.txt  \
+					example/fail_expected_tap.txt  \
+					example/auto_assert_expected.txt  \
+					example/auto_assert_no_expected.txt  \
+					example/require_expected.txt
 
 install: $(TARGET)
 	/bin/cp -pf $(TARGET) $(GOPATH)/bin

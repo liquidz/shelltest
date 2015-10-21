@@ -58,7 +58,6 @@ func (cli *CLI) Run(args []string) int {
 		flagVersion bool
 		shell       string
 		fmtr        string
-		err         error
 	)
 
 	cwd, _ := os.Getwd()
@@ -93,10 +92,14 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	cli.suite, err = Parse(args[0])
-	if err != nil {
-		cli.err("failed to parse: %v", err)
-		return ExitCodeError
+	// parse files
+	for _, filepath := range args {
+		ts, err := Parse(filepath)
+		if err != nil {
+			cli.err("failed to parse: %v", err)
+			return ExitCodeError
+		}
+		cli.suite = cli.suite.Merge(ts)
 	}
 	cli.suite.EnvMap = env.Map
 

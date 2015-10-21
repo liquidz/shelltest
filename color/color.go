@@ -2,6 +2,7 @@ package color
 
 import (
 	"fmt"
+	"regexp"
 )
 
 const (
@@ -11,6 +12,9 @@ const (
 )
 
 var NoColor = false
+
+// c.f. http://www.commandlinefu.com/commands/view/3584/remove-color-codes-special-characters-with-sed
+var ansiColorRegexp = regexp.MustCompile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)
 
 func colorize(color int, s string) string {
 	if NoColor {
@@ -30,4 +34,8 @@ func GreenStr(s string) string {
 
 func YellowStr(s string) string {
 	return colorize(ColorYellow, s)
+}
+
+func DeleteColor(s string) string {
+	return ansiColorRegexp.ReplaceAllString(s, "")
 }

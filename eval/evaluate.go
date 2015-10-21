@@ -3,15 +3,10 @@ package eval
 import (
 	"errors"
 	"fmt"
+	. "github.com/liquidz/shelltest/color"
 	. "github.com/liquidz/shelltest/debug"
 	. "github.com/liquidz/shelltest/testcase"
-	"regexp"
 	"strings"
-)
-
-const (
-	// c.f. http://www.commandlinefu.com/commands/view/3584/remove-color-codes-special-characters-with-sed
-	AnsiColor = `\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`
 )
 
 type Callback func(int, TestCase, error)
@@ -37,8 +32,6 @@ func (e EvaluateError) Error() string {
 
 func Evaluate(shell string, suite TestSuite, callback Callback) []error {
 	var errs []error
-
-	ansiColorRegexp := regexp.MustCompile(AnsiColor)
 
 	var exports []string
 	for k, v := range suite.EnvMap {
@@ -67,7 +60,7 @@ loop:
 			}
 
 			// remove color codes
-			result = ansiColorRegexp.ReplaceAllString(result, "")
+			result = DeleteColor(result)
 
 			testcase := suite.Tests[i]
 			expected := testcase.Expected
