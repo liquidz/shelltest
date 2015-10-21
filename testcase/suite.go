@@ -6,8 +6,6 @@ import (
 )
 
 type TestSuite struct {
-	Before TestCases
-	After  TestCases
 	Tests  TestCases
 	EnvMap map[string]string
 }
@@ -23,13 +21,33 @@ func (ts *TestSuite) Append(test TestCase) error {
 
 func (ts *TestSuite) String() string {
 	s := fmt.Sprintf(`
-[before]
-  %v
 [tests]
   %v
-[after]
-  %v
-	`, ts.Before, ts.Tests, ts.After)
+	`, ts.Tests)
 
 	return strings.TrimSpace(s)
+}
+
+func mergeMap(m1, m2 map[string]string) map[string]string {
+	res := map[string]string{}
+	for k, v := range m1 {
+		res[k] = v
+	}
+	for k, v := range m2 {
+		res[k] = v
+	}
+	return res
+}
+
+func (ts1 TestSuite) Merge(ts2 TestSuite) TestSuite {
+	res := TestSuite{EnvMap: mergeMap(ts1.EnvMap, ts2.EnvMap)}
+
+	for _, tc := range ts1.Tests {
+		res.Tests = append(res.Tests, tc)
+	}
+	for _, tc := range ts2.Tests {
+		res.Tests = append(res.Tests, tc)
+	}
+
+	return res
 }
