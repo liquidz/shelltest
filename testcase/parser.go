@@ -1,6 +1,7 @@
 package testcase
 
 import (
+	. "github.com/liquidz/shelltest/mock"
 	"regexp"
 	"strings"
 )
@@ -39,16 +40,20 @@ func getAutoAssertion(tc TestCase) TestCase {
 	}
 }
 
-func Parse(s string) (TestSuite, error) {
+func Parse(filepath string) (TestSuite, error) {
 	var (
 		tc    TestCase
 		ts    TestSuite
 		match []string
 	)
 
-	lastComment := ""
-	s = multiLineRegexp.ReplaceAllString(s, " ")
+	b, err := ReadFile(filepath)
+	if err != nil {
+		return ts, err
+	}
 
+	lastComment := ""
+	s := multiLineRegexp.ReplaceAllString(string(b), " ")
 	for _, l := range newLineRegexp.Split(strings.TrimSpace(s), -1) {
 		if strings.TrimSpace(l) == "" {
 			continue

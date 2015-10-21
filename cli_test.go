@@ -53,7 +53,7 @@ func TestRunNotExistingFile(t *testing.T) {
 		t.Errorf("expected %v to eq %v", status, ExitCodeError)
 	}
 
-	expected := "not found"
+	expected := "no such file"
 	if !strings.Contains(errStream.String(), expected) {
 		t.Errorf("expected %v to contains %v", errStream.String(), expected)
 	}

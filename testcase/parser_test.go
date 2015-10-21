@@ -1,17 +1,19 @@
 package testcase
 
 import (
+	. "github.com/liquidz/shelltest/mock"
 	"reflect"
 	"testing"
 )
 
 func TestParseWithDefaultSection(t *testing.T) {
-	sample := `
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ command
 foo
-	`
+	`, nil})
+	defer ResetMock()
 
-	ts, err := Parse(sample)
+	ts, err := Parse("foo")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -31,12 +33,14 @@ foo
 }
 
 func TestParseWithMultipleLineCommand(t *testing.T) {
-	sample := `
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa \
 bb
 cc
-`
-	ts, err := Parse(sample)
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -54,14 +58,16 @@ cc
 }
 
 func TestParseWithCommentLine(t *testing.T) {
-	sample := `
+	MockReadFile(ReadFileReturn{`
 # foo
 core@foo ~ $ aa
   # bar
 bb
 	# baz
-`
-	ts, err := Parse(sample)
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -81,11 +87,13 @@ bb
 }
 
 func TestParseWithRegexpMethod(t *testing.T) {
-	sample := `
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 =~ foo
-`
-	ts, err := Parse(sample)
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -103,20 +111,26 @@ core@foo ~ $ aa
 }
 
 func TestParseErrorWithRegexpMethod(t *testing.T) {
-	_, err := Parse(`
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 =~ foo(
-`)
+	`, nil})
+	defer ResetMock()
+
+	_, err := Parse("foo")
 	if err == nil {
 		t.Errorf("parsing regexp error should be occured")
 	}
 }
 
 func TestParseWithAutoAssertion(t *testing.T) {
-	ts, err := Parse(`
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 core@foo ~ $ bb
-`)
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -133,11 +147,14 @@ core@foo ~ $ bb
 }
 
 func TestParseWithoutAutoAssertion(t *testing.T) {
-	NoAutoAssertion = true
-	ts, err := Parse(`
+	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 core@foo ~ $ bb
-`)
+	`, nil})
+	defer ResetMock()
+
+	NoAutoAssertion = true
+	ts, err := Parse("foo")
 	NoAutoAssertion = false
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)

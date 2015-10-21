@@ -8,7 +8,6 @@ import (
 	. "github.com/liquidz/shelltest/debug"
 	. "github.com/liquidz/shelltest/eval"
 	. "github.com/liquidz/shelltest/formatter"
-	. "github.com/liquidz/shelltest/mock"
 	. "github.com/liquidz/shelltest/testcase"
 	"io"
 	"os"
@@ -59,6 +58,7 @@ func (cli *CLI) Run(args []string) int {
 		flagVersion bool
 		shell       string
 		fmtr        string
+		err         error
 	)
 
 	cwd, _ := os.Getwd()
@@ -93,15 +93,10 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	b, err := ReadFile(args[0])
-	if err != nil {
-		cli.err("file is not found: %v", args[0])
-		return ExitCodeError
-	}
-
-	cli.suite, err = Parse(string(b))
+	cli.suite, err = Parse(args[0])
 	if err != nil {
 		cli.err("failed to parse: %v", err)
+		return ExitCodeError
 	}
 	cli.suite.EnvMap = env.Map
 
