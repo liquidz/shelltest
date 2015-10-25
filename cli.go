@@ -71,8 +71,8 @@ func (cli *CLI) Run(args []string) int {
 	flags.StringVar(&fmtr, "f", "default", "formatter")
 	flags.BoolVar(&flagLint, "l", false, "lint")
 	flags.BoolVar(&ShellTestDebugMode, "d", false, "Debug mode")
-	flags.BoolVar(&NoColor, "nocolor", false, "no color")
-	flags.BoolVar(&NoAutoAssertion, "noautoassert", false, "no auto assert")
+	flags.BoolVar(&NoColor, "no-color", false, "no color")
+	flags.BoolVar(&NoAutoAssertion, "no-auto-assert", false, "no auto assert")
 	flags.BoolVar(&flagVersion, "v", false, "Print version information and quit.")
 	flags.Var(&env, "E", "environmental variable")
 
@@ -89,6 +89,7 @@ func (cli *CLI) Run(args []string) int {
 	args = flags.Args()
 	if len(args) == 0 {
 		cli.err("no argument")
+		flags.PrintDefaults()
 		return ExitCodeError
 	}
 

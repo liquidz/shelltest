@@ -1,4 +1,4 @@
 $ shelltest example/regexp.txt
-...
+....
 
-3 tests, 0 failures
+4 tests, 0 failures

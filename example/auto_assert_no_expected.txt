@@ -1,2 +1,2 @@
-$ shelltest -noautoassert example/auto_assert.txt
+$ shelltest --no-auto-assert example/auto_assert.txt
 0 tests, 0 failures

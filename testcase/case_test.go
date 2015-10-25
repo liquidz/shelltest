@@ -20,15 +20,43 @@ func TestAssertionAssertWithEqualMethod(t *testing.T) {
 	}
 }
 
-func TestAssertionAssertWithRegexpMethod(t *testing.T) {
+func TestAssertionAssertWithNotEqualMethod(t *testing.T) {
+	a := Assertion{Method: NotEqualMethod, Text: "foo"}
+	tests := map[string]bool{
+		"foo": false,
+		"bar": true,
+	}
+	for s, expected := range tests {
+		if a.Assert(s) != expected {
+			t.Errorf("assert %s should be %v", s, expected)
+		}
+	}
+}
+
+func TestAssertionAssertWithMatchMethod(t *testing.T) {
 	var a Assertion
 
-	a = Assertion{Method: RegexpMethod, Text: "foo"}
+	a = Assertion{Method: MatchMethod, Text: "foo"}
 	tests := map[string]bool{
 		"":       false,
 		"foo":    true,
 		"bar":    false,
 		"foobar": true,
+	}
+	for s, expected := range tests {
+		if a.Assert(s) != expected {
+			t.Errorf("assert %s should be %v", s, expected)
+		}
+	}
+}
+
+func TestAssertionAssertWithNotMatchMethod(t *testing.T) {
+	a := Assertion{Method: NotMatchMethod, Text: "foo"}
+	tests := map[string]bool{
+		"":       true,
+		"foo":    false,
+		"bar":    true,
+		"foobar": false,
 	}
 	for s, expected := range tests {
 		if a.Assert(s) != expected {

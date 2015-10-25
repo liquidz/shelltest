@@ -1,10 +1,24 @@
 = shelltest image:https://circleci.com/gh/liquidz/shelltest.svg?style=svg["Circle CI", link="https://circleci.com/gh/liquidz/shelltest"]
+:toc:
+:toc-placement: preamble
+:toclevels: 2
 
-Shell test tool inspired by doctool in link:https://pymotw.com/2/doctest/[Python] and link:http://elixir-lang.org/docs/v1.0/ex_unit/ExUnit.DocTest.html[Elixir].
+// Need some preamble to get TOC:
+{empty}
 
-NOTE: shelltest is ALPHA version
+Shell testing tool inspired by doctest in link:https://pymotw.com/2/doctest/[Python] and link:http://elixir-lang.org/docs/v1.0/ex_unit/ExUnit.DocTest.html[Elixir].
 
-== Example
+NOTE: shelltest is still ALPHA version
+
+== Installation
+
+for user::
+    Download binary file from releases page. +
+    https://github.com/liquidz/shelltest/releases
+for developer::
+    `go get github.com/liquidz/shelltest`
+
+== Getting started
 
 .example/hello.txt
 ----
@@ -14,7 +28,6 @@ bash$ echo $?
 0
 ----
 .run shelltest
-[source,bash]
 ----
 $ shelltest example/hello.txt
 ..
@@ -22,22 +35,108 @@ $ shelltest example/hello.txt
 2 tests, 0 failures
 ----
 
-.example/regexp.txt
-----
-bash$ echo foobar
-=~ foo
-bash$ echo foobar
-=~ bar
-bash$ echo foobar
-=~ foobar
-----
-.run shelltest
-----
-$ shelltest example/regexp.txt
-...
+== Usage
 
-3 tests, 0 failures
+
+=== Formatter
+
+.Default formatter
 ----
+$ shelltest example/fail.txt
+
+0) (exit 1); echo $?
+   command : (exit 1); echo $?
+   expected: [{equals 0}]
+   actual  : 1
+
+x.
+
+2 tests, 1 failures
+----
+.Tap formatter
+----
+$ shelltest -f tap example/fail.txt
+1..2
+not ok 1 - (exit 1); echo $?
+ok 2 - echo foo
+----
+
+=== Assertion
+
+.Auto assertion
+----
+# ok
+$ (exit 0)
+# ng
+$ (exit 1)
+----
+To disable auto assertion, use `--no-auto-assertion` option.
+
+.Equal assertion
+----
+# ok
+$ echo foo
+foo
+# ng
+$ echo foo
+bar
+----
+.Not equal assertion
+----
+# ok
+$ echo foo
+!= bar
+# ng
+$ echo foo
+!= foo
+----
+.Match assertion
+----
+# ok
+$ echo foo
+=~ fo*
+# ng
+=~ ba*
+----
+.Not match assertion
+----
+# ok
+$ echo foo
+!~ ooo
+# ng
+!~ oo
+----
+
+=== Require another test
+
+----
+@require another_test.txt
+
+$ echo foo
+foo
+----
+
+== Continuous Integration
+
+=== CircleCI
+
+.circle.yml
+----
+dependencies:
+  pre:
+    - wget -O shelltest https://github.com/liquidz/shelltest/releases/download/v0.1.1/shelltest_linux_amd64
+    - chmod +x shelltest
+test:
+  override:
+    - ./shelltest test/*.shelltest
+----
+
+== Editor support
+
+=== Vim
+
+* Syntax highlight for `*.shelltest`
+** https://github.com/liquidz/vim-shelltest
 
 == License
 

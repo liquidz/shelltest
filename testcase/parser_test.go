@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestParseWithDefaultSection(t *testing.T) {
+func TestParse(t *testing.T) {
 	MockReadFile(ReadFileReturn{`
 core@foo ~ $ command
 foo
@@ -86,7 +86,31 @@ bb
 
 }
 
-func TestParseWithRegexpMethod(t *testing.T) {
+func TestParseWithNotEqualMethod(t *testing.T) {
+	MockReadFile(ReadFileReturn{`
+core@foo ~ $ aa
+!= foo
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{
+			Command:  "aa",
+			Expected: Assertion{NotEqualMethod, "foo"}.ToArray(),
+		},
+	}
+
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
+
+func TestParseWithMatchMethod(t *testing.T) {
 	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 =~ foo
@@ -101,7 +125,7 @@ core@foo ~ $ aa
 	expected := TestCases{
 		TestCase{
 			Command:  "aa",
-			Expected: Assertion{RegexpMethod, "foo"}.ToArray(),
+			Expected: Assertion{MatchMethod, "foo"}.ToArray(),
 		},
 	}
 
@@ -110,10 +134,47 @@ core@foo ~ $ aa
 	}
 }
 
-func TestParseErrorWithRegexpMethod(t *testing.T) {
+func TestParseErrorWithMatchMethod(t *testing.T) {
 	MockReadFile(ReadFileReturn{`
 core@foo ~ $ aa
 =~ foo(
+	`, nil})
+	defer ResetMock()
+
+	_, err := Parse("foo")
+	if err == nil {
+		t.Errorf("parsing regexp error should be occured")
+	}
+}
+
+func TestParseWithNotMatchMethod(t *testing.T) {
+	MockReadFile(ReadFileReturn{`
+core@foo ~ $ aa
+!~ foo
+	`, nil})
+	defer ResetMock()
+
+	ts, err := Parse("foo")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	expected := TestCases{
+		TestCase{
+			Command:  "aa",
+			Expected: Assertion{NotMatchMethod, "foo"}.ToArray(),
+		},
+	}
+
+	if !reflect.DeepEqual(expected, ts.Tests) {
+		t.Errorf("expected testcase: %v, actual testcase %v", expected, ts.Tests)
+	}
+}
+
+func TestParseErrorWithNotMatchMethod(t *testing.T) {
+	MockReadFile(ReadFileReturn{`
+core@foo ~ $ aa
+!~ foo(
 	`, nil})
 	defer ResetMock()
 

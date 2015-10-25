@@ -1,0 +1,2 @@
+$ VERSION=$(grep Version version.go | awk '{print $5}' | sed 's/"//g')
+$ grep $VERSION README.adoc

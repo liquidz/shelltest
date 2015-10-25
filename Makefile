@@ -3,7 +3,7 @@
 export PATH := .:$(PATH)
 TARGET = shelltest
 
-$(TARGET): **/*.go
+$(TARGET): *.go **/*.go
 	go build -o $(TARGET)
 
 rebuild: clean $(TARGET)
@@ -13,7 +13,8 @@ clean:
 
 test: $(TARGET)
 	go test ./... && \
-		./$(TARGET) example/hello_expected.txt  \
+		./$(TARGET) check_ver.shelltest \
+					example/hello_expected.txt  \
 					example/regexp_expected.txt  \
 					example/fail_expected.txt  \
 					example/fail_expected_tap.txt  \

@@ -7,8 +7,10 @@ import (
 )
 
 const (
-	EqualMethod  = "equals"
-	RegexpMethod = "matches"
+	EqualMethod    = "equals"
+	NotEqualMethod = "not equals"
+	MatchMethod    = "matches"
+	NotMatchMethod = "not matches"
 )
 
 const (
@@ -17,11 +19,12 @@ const (
 
 var NoAutoAssertion = false
 var commandRegexp = regexp.MustCompile(`^[^$]*\$\s+(.+)\s*$`)
-var sectionRegexp = regexp.MustCompile(`^\[\s*(.+)\s*\]$`)
 var newLineRegexp = regexp.MustCompile(`[\r\n]+`)
 var multiLineRegexp = regexp.MustCompile(`\s+\\\s*[\r\n]+`)
 var commentRegexp = regexp.MustCompile(`^\s*#\s*`)
-var regexpRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
+var notEqualRegexp = regexp.MustCompile(`^!=\s+(.+)\s*$`)
+var matchRegexp = regexp.MustCompile(`^=~\s+(.+)\s*$`)
+var notMatchRegexp = regexp.MustCompile(`^!~\s+(.+)\s*$`)
 var requireRegexp = regexp.MustCompile(`^@require\s+(.+)\s*$`)
 
 func getAutoAssertion(tc TestCase) TestCase {
@@ -92,12 +95,25 @@ func Parse(filepath string) (TestSuite, error) {
 			continue
 		}
 
-		// Regexp Assertion
-		if match = regexpRegexp.FindStringSubmatch(l); len(match) == 2 {
+		// NotEquals Assertion
+		if match = notEqualRegexp.FindStringSubmatch(l); len(match) == 2 {
+			tc.AppendAssertion(NotEqualMethod, match[1])
+			continue
+		}
+		// Match Assertion
+		if match = matchRegexp.FindStringSubmatch(l); len(match) == 2 {
 			if _, err := regexp.Compile(match[1]); err != nil {
 				return ts, err
 			}
-			tc.AppendAssertion(RegexpMethod, match[1])
+			tc.AppendAssertion(MatchMethod, match[1])
+			continue
+		}
+		// NotMatch Assertion
+		if match = notMatchRegexp.FindStringSubmatch(l); len(match) == 2 {
+			if _, err := regexp.Compile(match[1]); err != nil {
+				return ts, err
+			}
+			tc.AppendAssertion(NotMatchMethod, match[1])
 			continue
 		}
 

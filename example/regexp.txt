@@ -4,3 +4,5 @@ bash$ echo foobar
 =~ bar
 bash$ echo foobar
 =~ foobar
+bash$ echo foobar
+!~ baz

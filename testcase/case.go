@@ -29,8 +29,12 @@ func (a *Assertion) Assert(s string) bool {
 	switch a.Method {
 	case EqualMethod:
 		return (a.Text == s)
-	case RegexpMethod:
+	case NotEqualMethod:
+		return (a.Text != s)
+	case MatchMethod:
 		return regexp.MustCompile(a.Text).MatchString(s)
+	case NotMatchMethod:
+		return !regexp.MustCompile(a.Text).MatchString(s)
 	}
 	return false
 }
